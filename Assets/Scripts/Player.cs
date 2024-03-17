@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -19,11 +18,12 @@ namespace Tutorial
         private Animator _anim;
         private bool _canHit = true;
         private int _health;
-     
 
-
+        public bool dieFlag;
+        
         private void Start()
         {
+            dieFlag = false;
             _rb = GetComponent<Rigidbody>();
             _anim = GetComponent<Animator>();
      
@@ -33,6 +33,7 @@ namespace Tutorial
 
         private void Update()
         {
+            if(dieFlag) return;
             Vector3 moveInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
             if (moveInput.magnitude > 0.1f)
@@ -57,6 +58,7 @@ namespace Tutorial
 
         IEnumerator Reload()
         {
+            if(dieFlag) yield break;
             _canHit = false;
             yield return new WaitForSeconds(reloadTime);
             _canHit = true;
@@ -64,17 +66,28 @@ namespace Tutorial
 
         public void GetDamage(int damage)
         {
+            if(dieFlag) return;
             _health -= damage; // _health = _health - damage
             ui.SetHealth(_health);
 
             if (_health <= 0)
             {
-                SceneManager.LoadScene(0);
+                StartCoroutine(EndGameAnim());
             }
         }
 
+
+        public IEnumerator EndGameAnim()
+        {
+            dieFlag = true;
+            _anim.SetTrigger("die");
+            yield return new WaitForSeconds(5f);
+            ui.ShowDieCurtain();
+        }
+        
         private void Hit()
         {
+            if(dieFlag) return;
             Collider[] colliders = Physics.OverlapSphere(hitPoint.position, hitRadius);
             for (int i = 0; i < colliders.Length; i++)
             {

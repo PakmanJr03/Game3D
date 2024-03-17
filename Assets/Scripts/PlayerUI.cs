@@ -1,5 +1,7 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Tutorial
 {
@@ -7,7 +9,15 @@ namespace Tutorial
     {
         [SerializeField] private GameObject[] hearts;
         [SerializeField] private TextMeshProUGUI treeCountText;
+        [SerializeField] private GameObject _curtain;
+        
+        
+        private int _treeCount;
 
+        private void OnEnable()
+        {
+            _curtain.SetActive(false);
+        }
 
         public void SetHealth(int health)
         {
@@ -29,6 +39,15 @@ namespace Tutorial
                 treeCountText.SetText(_treeCount.ToString());
             }
         }
-        private int _treeCount;
+
+        public void GoToMenu()
+        {
+            SceneManager.LoadScene(0);
+        }
+        
+        public void ShowDieCurtain()
+        {
+            _curtain.SetActive(true);
+        }
     }
 }
